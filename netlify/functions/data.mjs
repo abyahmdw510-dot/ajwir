@@ -53,4 +53,4 @@ export default async (req) => {
   try { await st.set(JSON.stringify(b.data)); return J({ ok: true }); }
   catch (e) { return J({ error: "تعذر الحفظ: " + String(e && e.message || e).slice(0, 120) }, 500); }
 };
-export const config = { path: "/api/data" };
+
