@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta property="og:title" content="بطولة آجوير المحلية لكرة القدم – النسخة 13"><meta property="og:description" content="تابع المباريات والنتائج والأخبار والهدافين مباشرة"><meta property="og:type" content="website"><meta name="theme-color" content="#0b7a43">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>بطولة آجوير المحلية لكرة القدم – النسخة 13</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
@@ -48,6 +49,10 @@ button{background:var(--pr);color:#fff;border:0;font-weight:700;cursor:pointer}b
 td .lg{width:30px;height:30px;font-size:13px}
 
 .shb{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.wa{display:inline-flex;align-items:center;gap:8px;background:#25d366;color:#07351b;font-weight:800;border-radius:12px;padding:10px 14px;font-size:14px}.wa svg{width:20px;height:20px}.sh2{background:var(--cd);color:var(--tx);border:1px solid var(--ln)}
+
+.st.live{animation:pl 1.2s infinite}@keyframes pl{50%{opacity:.55}}
+.lv{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.lv button{padding:15px 6px;font-size:15px}.lv button.y{background:#f2b705;color:#10231a}.lv button.r{background:var(--rd)}
+.toast{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);inset-inline:12px;z-index:9;background:var(--pr);color:#fff;font-weight:800;padding:12px;border-radius:12px;text-align:center;display:none;box-shadow:0 4px 14px #0005}
 </style></head><body>
 <main id="app"></main><nav id="nav"></nav>
 <script>
@@ -72,10 +77,10 @@ const ms=()=>S.matches.map(m=>m.id=='final'?nz({...m,a:win(G('sf1')),b:win(G('sf
 const ts=m=>m.date?new Date(m.date+'T'+(m.time||'00:00')).getTime():0;
 const when=m=>(m.date?new Date(ts(m)).toLocaleDateString('ar',{weekday:'long',day:'numeric',month:'long'}):'الموعد لم يحدد بعد')+(m.time?' • '+m.time:'')+((m.venue||S.info.venue)?' • '+e(m.venue||S.info.venue):'');
 function card(m,big){const a=T(m.a),b=T(m.b),sh=m.status=='done'||m.status=='live';
-return`<a class="mc ${big?'big':''}" href="#/m/${m.id}"><div class="rd"><span>${RD[m.round]||e(m.round)}</span><span class="st ${m.status}">${ST[m.status]}</span></div><div class="row"><div class="tm">${lg(a)}<b>${e(a?.name||'يحدد لاحقًا')}</b></div><div class="sc">${sh?(m.sa??0)+' – '+(m.sb??0):'×'}</div><div class="tm">${lg(b)}<b>${e(b?.name||'يحدد لاحقًا')}</b></div></div>${m.pa!=null&&m.pb!=null?`<div class="mt">ركلات الترجيح: ${m.pa} – ${m.pb}</div>`:''}<div class="mt">${when(m)}</div></a>`}
+return`<a class="mc ${big?'big':''}" href="#/m/${m.id}"><div class="rd"><span>${RD[m.round]||e(m.round)}</span><span class="st ${m.status}">${ST[m.status]}${m.status=='live'&&m.t0?' • '+mnH(m):''}</span></div><div class="row"><div class="tm">${lg(a)}<b>${e(a?.name||'يحدد لاحقًا')}</b></div><div class="sc">${sh?(m.sa??0)+' – '+(m.sb??0):'×'}</div><div class="tm">${lg(b)}<b>${e(b?.name||'يحدد لاحقًا')}</b></div></div>${m.pa!=null&&m.pb!=null?`<div class="mt">ركلات الترجيح: ${m.pa} – ${m.pb}</div>`:''}<div class="mt">${when(m)}</div></a>`}
 const nextM=()=>ms().filter(m=>m.status=='wait'&&m.a&&m.b&&m.date).sort((x,y)=>ts(x)-ts(y))[0];
 const cdH=m=>`<div class="cd" data-t="${ts(m)}"></div>`;
-function tick(){document.querySelectorAll('.cd').forEach(el=>{let d=Math.max(0,el.dataset.t-Date.now())/1000|0;const p=[[d/86400|0,'يوم'],[d%86400/3600|0,'ساعة'],[d%3600/60|0,'دقيقة'],[d%60,'ثانية']];el.innerHTML=p.map(x=>`<div>${x[0]}<small>${x[1]}</small></div>`).join('')})}
+function tick(){document.querySelectorAll('.mn').forEach(el=>{el.textContent=lvm(+el.dataset.a,+el.dataset.b,+el.dataset.h)+"'"});document.querySelectorAll('.cd').forEach(el=>{let d=Math.max(0,el.dataset.t-Date.now())/1000|0;const p=[[d/86400|0,'يوم'],[d%86400/3600|0,'ساعة'],[d%3600/60|0,'دقيقة'],[d%60,'ثانية']];el.innerHTML=p.map(x=>`<div>${x[0]}<small>${x[1]}</small></div>`).join('')})}
 setInterval(tick,1000);
 function calc(){const r={};S.teams.forEach(t=>r[t.id]={t,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0});
 ms().filter(m=>m.status=='done'&&m.a&&m.b&&m.sa!=null&&m.sb!=null).forEach(m=>{const x=r[m.a],y=r[m.b];if(!x||!y)return;x.p++;y.p++;x.gf+=m.sa;x.ga+=m.sb;y.gf+=m.sb;y.ga+=m.sa;if(m.sa>m.sb){x.w++;y.l++;x.pts+=3}else if(m.sb>m.sa){y.w++;x.l++;y.pts+=3}else{x.d++;y.d++;x.pts++;y.pts++}});
@@ -90,10 +95,10 @@ const nl=()=>[...S.news].sort((a,b)=>(b.d||'').localeCompare(a.d||''));
 function home(){const n=nextM(),done=ms().filter(m=>m.status=='done').sort((a,b)=>ts(b)-ts(a))[0],q=S.teams.map(t=>`<span class="st">${e(t.name)}</span>`).join(' '),c=calc(),tp=cnt('g','pg','og');
 return`<section class="hero"><div style="font-size:42px">⚽</div><h1>${e(S.info.name)}</h1><span class="ed">${e(S.info.edition)}</span><div style="margin-top:8px">قرية ${e(S.info.village)}</div></section>
 <div class="grid" style="margin-top:10px">${[['matches','المباريات'],['teams','الفرق'],['table','الترتيب'],['scorers','الهدافون'],['news','الأخبار'],['stats','الإحصائيات']].map(x=>`<a href="#/${x[0]}">${x[1]}</a>`).join('')}</div>
-<h2>المباراة القادمة</h2>${n?card(n,1)+cdH(n):'<div class="card mu">لم يتم تحديد موعد المباراة القادمة بعد</div>'}
+${ms().some(m=>m.status=='live')?'<h2>🔴 مباشر الآن</h2>'+ms().filter(m=>m.status=='live').map(m=>card(m,1)).join(''):''}<h2>المباراة القادمة</h2>${n?card(n,1)+cdH(n):'<div class="card mu">لم يتم تحديد موعد المباراة القادمة بعد</div>'}
 <h2>آخر نتيجة</h2>${done?card(done):'<div class="card mu">لا توجد نتائج بعد</div>'}
 <h2>الفرق المتأهلة لنصف النهائي</h2><div class="card">${q}</div><h2>الأدوار الإقصائية</h2>${bracket()}
-<h2>إحصائيات مختصرة</h2><div class="grid"><div class="tile"><b>${S.matches.filter(m=>m.status=='done').length}</b>مباريات منتهية</div><div class="tile"><b>${tp}</b>أهداف مسجلة</div></div>
+${(x=>x?`<div class="card">🥇 الهداف: <b>${e(x.p)}</b> — ${e(T(x.t)?.name||'')} (${x.g})</div>`:'')(scorers()[0])}<h2>إحصائيات مختصرة</h2><div class="grid"><div class="tile"><b>${S.matches.filter(m=>m.status=='done').length}</b>مباريات منتهية</div><div class="tile"><b>${tp}</b>أهداف مسجلة</div></div>
 <h2>آخر الأخبار</h2>${nl().slice(0,3).map(news).join('')||'<div class="card mu">لا توجد أخبار بعد</div>'}`}
 function matches(){const n=nextM();return`<h2>المباريات</h2>${n?'<div class="mu">المباراة القادمة</div>'+card(n,1)+cdH(n):''}${ms().map(m=>card(m)).join('')}`}
 const pitch=(m,s)=>{const L=(m.lu||{})[s];if(!L||!(L.st||[]).some(Boolean))return'<div class="card mu">لم تُدخل التشكيلة الأساسية بعد</div>';
@@ -141,7 +146,7 @@ const evF=i=>{const m=S.matches[i];return`<div class="f"><select id="k${i}">${Ob
 function evT(i){const t=T($('#t'+i).value),o='<option value="">— اللاعب (الخارج في التبديل) —</option>'+(t?t.pl.map(p=>`<option value="${p.id}">${e(p.n)}</option>`).join(''):'');$('#p'+i).innerHTML=o;$('#q'+i).innerHTML=o.replace('اللاعب (الخارج في التبديل)','اللاعب الداخل (للتبديل)')}
 function addEv(i){const g=x=>$('#'+x+i).value,k=g('k');if(!PH.includes(k)&&!g('p'))return alert('اختر اللاعب');if(k=='s'&&!g('q'))return alert('اختر اللاعب الداخل');S.matches[i].ev.push({k,t:PH.includes(k)?null:+g('t')||null,pid:+g('p')||null,p2:+g('q')||null,min:+g('mi')||0,d:g('d')});dirty=true;render()}
 function admin(){if(!U.isOwner())return`<div class="card"><h2>🔒 لوحة الإدارة</h2><div class="f"><input id="pw" type="password" placeholder="كلمة سر المسؤول"><button onclick="login()">دخول</button></div><div id="st" class="mu"></div></div>`;
-const mm=S.matches.map((m,i)=>`<div class="card"><b>${RD[m.round]||e(m.round)}</b>
+const mm=S.matches.map((m,i)=>`<div class="card"><b>${RD[m.round]||e(m.round)}</b> <a class="wa" href="#/live/${m.id}" style="padding:4px 10px;font-size:12px">🎛️ تحكم مباشر</a>
 ${m.id!='final'?`<div class="f">${sel(`matches.${i}.a`,m.a,tOpts())}${sel(`matches.${i}.b`,m.b,tOpts())}</div>`:'<div class="mu">فريقا النهائي يتحددان تلقائيًا من نتيجتي نصف النهائي</div>'}
 <div class="f"><input type="date" value="${m.date}" onchange="sp('matches.${i}.date',this)"><input type="time" value="${m.time}" onchange="sp('matches.${i}.time',this)">${inp(`matches.${i}.venue`,m.venue,'الملعب')}</div>
 <div class="f">${sel(`matches.${i}.status`,m.status,Object.entries(ST),1)}<input type="number" placeholder="أهداف الأول" value="${m.sa??''}" onchange="sp('matches.${i}.sa',this)"><input type="number" placeholder="أهداف الثاني" value="${m.sb??''}" onchange="sp('matches.${i}.sb',this)"></div>
@@ -154,9 +159,9 @@ const tt=S.teams.map((t,i)=>`<details class="card"><summary>${lg(t)} ${e(t.name)
 ${t.pl.map((p,j)=>`<div class="card"><div class="f">${lg({name:p.n,logo:p.img})}${inp(`teams.${i}.pl.${j}.n`,p.n,'اللاعب')}${inp(`teams.${i}.pl.${j}.p`,p.p,'المركز')}<input type="number" placeholder="الرقم" value="${p.no??''}" onchange="sp('teams.${i}.pl.${j}.no',this)"><input type="date" value="${p.dob||''}" onchange="sp('teams.${i}.pl.${j}.dob',this)">${sel(`teams.${i}.pl.${j}.st`,p.st||'',[['ok','متاح'],['inj','مصاب'],['','غير محدد']])}</div><div class="f"><input type="file" accept="image/*" onchange="up(this,'teams.${i}.pl.${j}.img',96)"><select onchange="mv(${i},${j},+this.value)">${S.teams.map((x,k)=>`<option value="${k}" ${k==i?'selected':''}>${e(x.name)}</option>`).join('')}</select><button class="d" onclick="S.teams[${i}].pl.splice(${j},1);dirty=true;render()">حذف</button></div></div>`).join('')}
 <button onclick="S.teams[${i}].pl.push({id:++uid,n:'',p:'',no:null});dirty=true;render()">+ لاعب</button> <button class="d" onclick="if(confirm('حذف الفريق؟')){S.matches.forEach(m=>{if(m.a==${t.id})m.a=null;if(m.b==${t.id})m.b=null});S.teams.splice(${i},1);dirty=true;render()}">حذف الفريق</button></details>`).join('');
 const nn=S.news.map((n,i)=>`<div class="card">${inp(`news.${i}.t`,n.t,'العنوان')}<input type="date" value="${e(n.d)}" onchange="sp('news.${i}.d',this)"><textarea style="width:100%" onchange="sp('news.${i}.x',this)">${e(n.x)}</textarea><input type="file" accept="image/*" onchange="up(this,'news.${i}.img',480)"><button class="d" onclick="S.news.splice(${i},1);dirty=true;render()">حذف الخبر</button></div>`).join('');
-return`<h2>لوحة الإدارة</h2><div class="card"><div class="mu">التغييرات لا تظهر للزوار حتى تضغط «نشر».</div><button onclick="pub()" style="width:100%;font-size:16px">${dirty?'نشر التغييرات ●':'نشر'}</button><div class="f"><button class="sh2" onclick="dl()">تنزيل نسخة data.json</button><button class="sh2" onclick="PW='';try{sessionStorage.removeItem('apw')}catch{};render()">خروج</button></div>
+return`<h2>لوحة الإدارة</h2><a class="wa" href="#/live">🎛️ غرفة التحكم المباشر</a><div class="card"><div class="mu">التغييرات لا تظهر للزوار حتى تضغط «نشر».</div><button onclick="pub()" style="width:100%;font-size:16px">${dirty?'نشر التغييرات ●':'نشر'}</button><div class="f"><button class="sh2" onclick="dl()">تنزيل نسخة data.json</button><label class="sh2" style="padding:8px 12px;border-radius:10px;cursor:pointer;display:inline-block">استرجاع نسخة<input type="file" accept="application/json,.json" hidden onchange="rs(this)"></label><button class="sh2" onclick="PW='';try{sessionStorage.removeItem('apw')}catch{};render()">خروج</button></div>
 <div class="f"><button onclick="if(confirm('تحميل بيانات تجريبية غير رسمية؟')){demo();render()}">تحميل بيانات تجريبية</button><button class="d" onclick="if(confirm('حذف كل البيانات والعودة للوضع الأولي؟')){const u=S.info.url;S=blank();S.info.url=u;dirty=true;render()}">حذف التجريبي / إعادة ضبط</button></div></div>
-<h2>معلومات البطولة</h2><div class="card f">${inp('info.name',S.info.name,'اسم البطولة')}${inp('info.edition',S.info.edition,'النسخة')}${inp('info.village',S.info.village,'القرية')}${inp('info.venue',S.info.venue,'الملعب')}${inp('info.url',S.info.url||'','رابط الموقع للمشاركة (الصق الرابط العام)')}<textarea style="width:100%" onchange="sp('info.text',this)" placeholder="نبذة">${e(S.info.text)}</textarea></div>
+<h2>معلومات البطولة</h2><div class="card f">${inp('info.name',S.info.name,'اسم البطولة')}${inp('info.edition',S.info.edition,'النسخة')}${inp('info.village',S.info.village,'القرية')}${inp('info.venue',S.info.venue,'الملعب')}${inp('info.url',S.info.url||'','رابط الموقع للمشاركة (الصق الرابط العام)')}<input type="number" min="5" max="60" placeholder="مدة الشوط بالدقائق" value="${S.info.half??30}" onchange="sp('info.half',this)" title="مدة الشوط الواحد"><textarea style="width:100%" onchange="sp('info.text',this)" placeholder="نبذة">${e(S.info.text)}</textarea></div>
 <h2>الفرق واللاعبون</h2>${tt}<button onclick="S.teams.push({id:Date.now(),name:'فريق جديد',logo:'',pl:[]});dirty=true;render()">+ فريق</button>
 <h2>المباريات</h2>${mm}<button onclick="S.matches.splice(S.matches.length-1,0,{id:'m'+Date.now(),round:'مباراة',a:null,b:null,date:'',time:'',venue:'',status:'wait',sa:null,sb:null,pa:null,pb:null,ev:[],la:'',lb:''});dirty=true;render()">+ مباراة</button>
 <h2>الأخبار</h2>${nn}<button onclick="S.news.push({id:Date.now(),t:'',d:new Date().toISOString().slice(0,10),x:'',img:''});dirty=true;render()">+ خبر</button>`}
@@ -170,11 +175,44 @@ async function login(){const v=$('#pw').value;if(!v)return;const r=await api({ac
 async function pub(){const r=await api({token:PW,data:S});if(r.ok){dirty=false;alert('تم النشر والحفظ بشكل دائم');render()}else if(r.status==401){PW='';try{sessionStorage.removeItem('apw')}catch{};alert('انتهت الجلسة، سجّل الدخول من جديد');render()}else alert('تعذر النشر: '+await why(r))}
 async function chk(){let t;try{const r=await fetch(FN+'?status',{cache:'no-store'}),j=r.ok?await r.json():null;t=!j?'⚠️ خدمة الإدارة غير منشورة على Netlify':!j.pw?'⚠️ ADMIN_PASSWORD غير مضبوطة':!j.storage?'⚠️ لا يوجد تخزين للبيانات':'✅ الخدمة جاهزة'}catch{t='⚠️ تعذر الاتصال بخدمة الإدارة'}const x=$('#st');if(x)x.textContent=t}
 function dl(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:'application/json'}));a.download='data.json';a.click()}
+// ---- extras
+const gcn=D=>D.matches.reduce((n,m)=>n+(m.ev||[]).filter(v=>['g','pg','og'].includes(v.k)).length,0),dcn=D=>D.matches.filter(m=>m.status=='done').length;
+function toast(t){let x=document.getElementById('toast');if(!x){x=document.createElement('div');x.id='toast';x.className='toast';document.body.appendChild(x)}x.textContent=t;x.style.display='block';clearTimeout(x._t);x._t=setTimeout(()=>{x.style.display='none'},5000)}
+function rs(el){const f=el.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!Array.isArray(d.teams)||!Array.isArray(d.matches))throw 1;if(!confirm('استبدال كل البيانات الحالية بهذه النسخة؟'))return;S=d;mig();dirty=true;render();alert('تم الاسترجاع. اضغط «نشر» لحفظه.')}catch{alert('الملف غير صالح')}};r.readAsText(f)}
+function pen(i,s,d){const m=S.matches[i];m.pa=m.pa??0;m.pb=m.pb??0;if(s=='a')m.pa=Math.max(0,m.pa+d);else m.pb=Math.max(0,m.pb+d);dirty=true;save();render()}
+const pnl=(i,m,v)=>`<div class="card"><b>🥅 ركلات الترجيح: ${m.pa??0} – ${m.pb??0}</b><div class="lv"><button onclick="pen(${i},'a',1)">✔ ${e(T(v.a).name)}</button><button onclick="pen(${i},'b',1)">✔ ${e(T(v.b).name)}</button><button class="r" onclick="pen(${i},'a',-1)">−1</button><button class="r" onclick="pen(${i},'b',-1)">−1</button></div><div class="mu">تظهر عند التعادل. المتأهل يُحدد تلقائيًا بعد «نهاية المباراة».</div></div>`;
+// ---- live control
+let lastJ='',lp=null,svT;
+const HL=()=>+S.info.half||30,lvm=(t0,t2,h)=>{if(!t0)return 0;const n=Date.now();if(t2)return HL()+Math.floor((n-t2)/6e4)+1;return h?HL():Math.floor((n-t0)/6e4)+1};
+const hasHT=m=>(m.ev||[]).some(v=>v.k=='ht'),lvMin=m=>lvm(m.t0,m.t2,hasHT(m));
+const mnH=m=>`<span class="mn" data-a="${m.t0||0}" data-b="${m.t2||0}" data-h="${hasHT(m)?1:0}">${lvMin(m)}'</span>`;
+function save(){clearTimeout(svT);svT=setTimeout(async()=>{let x=$('#sv');if(x)x.textContent='⏳ جارٍ الحفظ...';const r=await api({token:PW,data:S});dirty=!r.ok;x=$('#sv');if(x)x.textContent=r.ok?'✅ تم الحفظ — الجمهور يرى التحديث خلال ثوانٍ':r.status==401?'🔒 انتهت الجلسة، سجّل الدخول من جديد':'⚠️ تعذر الحفظ، اضغط أي زر لإعادة المحاولة'},400)}
+function ph(i,k){const m=S.matches[i],mn=lvMin(m);m.ev=m.ev||[];
+if(k=='ko'){m.status='live';m.t0=Date.now();m.t2=null;m.ev.push({k,min:0,d:''})}
+if(k=='ht')m.ev.push({k,min:HL(),d:''});
+if(k=='sh'){m.t2=Date.now();m.ev.push({k,min:HL(),d:''})}
+if(k=='ft'){m.status='done';m.ev.push({k,min:mn,d:''})}
+dirty=true;save();render()}
+function undo(i){const m=S.matches[i],v=(m.ev||[]).pop();if(!v)return;if(v.k=='ko'){m.status='wait';m.t0=null}if(v.k=='sh')m.t2=null;if(v.k=='ft')m.status='live';dirty=true;save();render()}
+function lpS(i,t,k){lp={i,t,k};render()}
+function lpOk(){const g=x=>$('#'+x).value,m=S.matches[lp.i];if(!g('lp'))return alert('اختر اللاعب');if(lp.k=='s'&&!g('lq'))return alert('اختر اللاعب الداخل');m.ev=m.ev||[];m.ev.push({k:lp.k,t:lp.t,pid:+g('lp')||null,p2:lp.k=='s'?+g('lq')||null:null,min:+g('lm')||0,d:g('ld')});lp=null;dirty=true;save();toast('✅ تم تسجيل الحدث');render()}
+function livep(id){if(!U.isOwner())return admin();
+const i=S.matches.findIndex(m=>m.id==id);
+if(i<0)return`<h2>🎛️ غرفة التحكم المباشر</h2>`+ms().filter(m=>m.a&&m.b).map(m=>`<a class="mc" href="#/live/${m.id}">${e(T(m.a).name)} × ${e(T(m.b).name)} <span class="st ${m.status}">${ST[m.status]}</span></a>`).join('')+'<div class="mu">اختر المباراة التي تريد إدارتها مباشرة</div>';
+const m=S.matches[i],v=ms()[i];
+if(!v.a||!v.b)return'<div class="card">حدد فريقي المباراة أولًا</div>';
+const nx=!m.t0?['ko','▶️ بدء المباراة']:m.status!='live'?null:!hasHT(m)?['ht','⏸️ نهاية الشوط الأول']:!m.t2?['sh','▶️ بدء الشوط الثاني']:['ft','🏁 نهاية المباراة'];
+const rows=t=>t.pl.map(p=>`<option value="${p.id}">${e(p.n)}${p.no?' #'+p.no:''}</option>`).join(''),op=(x,t)=>`<option value="">${x}</option>`+rows(t);
+const sb=t=>{const x=T(t);return`<div class="card"><b>${e(x.name)}</b><div class="lv">${[['g','⚽ هدف',''],['pg','⚽ ركلة جزاء',''],['pm','❌ ركلة مهدرة',''],['y','🟨 إنذار','y'],['r','🟥 طرد','r'],['s','🔁 تبديل','']].map(k=>`<button class="${k[2]}" onclick="lpS(${i},${t},'${k[0]}')">${k[1]}</button>`).join('')}</div></div>`};
+const pk=lp&&lp.i==i?(()=>{const t=T(lp.t);return`<div class="card"><b>${IC[lp.k]} ${EN[lp.k]} — ${e(t.name)}</b><div class="f"><select id="lp">${op(lp.k=='s'?'— اللاعب الخارج —':'— اللاعب —',t)}</select>${lp.k=='s'?`<select id="lq">${op('— اللاعب الداخل —',t)}</select>`:''}<input id="lm" type="number" value="${lvMin(m)}"><input id="ld" placeholder="وصف مختصر (اختياري)"></div><div class="f"><button onclick="lpOk()">تأكيد</button><button class="d" onclick="lp=null;render()">إلغاء</button></div>${t.pl.length?'':'<div class="mu">أضف لاعبي الفريق من لوحة الإدارة أولًا</div>'}</div>`})():'';
+return`<a class="sh2" href="#/live" style="display:inline-block;padding:8px 12px;border-radius:10px">⬅ المباريات</a>${card(v,1)}<div class="card" style="text-align:center;font-size:28px;font-weight:800">${m.status=='live'&&m.t0?mnH(v):'—'}</div><div id="sv" class="mu" style="text-align:center"></div>
+${nx?`<button style="width:100%;font-size:17px;padding:14px" onclick="ph(${i},'${nx[0]}')">${nx[1]}</button>`:''}${pk}${sb(v.a)}${sb(v.b)}
+${(v.sa??0)==(v.sb??0)&&m.status!='wait'?pnl(i,m,v):''}<div class="card"><b>آخر الأحداث</b>${[...(m.ev||[])].slice(-5).reverse().map(x=>`<div class="ev">${IC[x.k]} ${x.min}' ${e(pn(x)||EN[x.k])}</div>`).join('')||'<span class="mu">لا أحداث</span>'}<button class="d" onclick="undo(${i})">↩ تراجع عن آخر حدث</button></div>${waA(sh('/m/'+m.id))} <a class="sh2" href="#/m/${m.id}" style="display:inline-block;padding:10px 14px;border-radius:12px">عرض صفحة الجمهور</a>`}
 // ---- share
 const WAI='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6-.3.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.2.1.8-.1 1.4z"/></svg>';
 const base=()=>S.info.url||location.href.split('#')[0];
 function sh(h){h=h||location.hash.slice(1)||'/';const[,r,a]=h.split('/'),I=S.info,N=I.name+' – '+I.edition,u=base()+(h=='/'?'':'#'+h);let t;
-if(r=='m'){const m=ms().find(x=>x.id==a);if(m){const A=T(m.a)?.name||'يحدد لاحقًا',B=T(m.b)?.name||'يحدد لاحقًا';t=m.status=='done'&&m.sa!=null?`🏆 نتيجة مباراة ${N}\n${A} ${m.sa} – ${m.sb} ${B}\nتابع النتيجة وتفاصيل المباراة:`:`⚽ مباراة ${N}\n${A} × ${B}\nتابع تفاصيل المباراة والنتيجة من هنا:`}}
+if(r=='m'){const m=ms().find(x=>x.id==a);if(m){const A=T(m.a)?.name||'يحدد لاحقًا',B=T(m.b)?.name||'يحدد لاحقًا';t=m.status=='live'?`🔴 مباشر الآن – ${N}\n${A} ${m.sa??0} – ${m.sb??0} ${B}\nتابع المباراة مباشرة:`:m.status=='done'&&m.sa!=null?`🏆 نتيجة مباراة ${N}\n${A} ${m.sa} – ${m.sb} ${B}\nتابع النتيجة وتفاصيل المباراة:`:`⚽ مباراة ${N}\n${A} × ${B}\nتابع تفاصيل المباراة والنتيجة من هنا:`}}
 else if(r=='n'){const n=S.news.find(x=>x.id==a);if(n)t=`📰 ${n.t}\nاقرأ الخبر كاملًا:`}
 else if(r=='t'){const x=T(a);if(x)t=`🛡️ فريق ${x.name} في ${N}\nتابع اللاعبين والمباريات:`}
 else t={matches:`📅 مباريات ${N}\nتابع المواعيد والنتائج من هنا:`,teams:`🛡️ فرق ${N}\nتعرّف على الفرق واللاعبين:`,table:`🏆 نتائج ${N} ونصف النهائي والنهائي\nتابع الترتيب والمتأهلين:`,scorers:`🥇 هدافو ${N}\nتابع ترتيب الهدافين:`,stats:`📊 إحصائيات ${N}\nتابع أرقام البطولة:`,news:`📰 أخبار ${N}\nتابع آخر الأخبار:`,info:`ℹ️ معلومات ${N}`}[r];
@@ -184,11 +222,12 @@ const shb=h=>{const x=sh(h);return`<div class="shb">${waA(x)}${navigator.share?`
 function nat(x){navigator.share({text:x}).catch(()=>{})}
 // ---- router
 function render(){const h=location.hash.slice(1)||'/',[,r,a]=h.split('/'),R={'':home,matches,teams,table,scorers:scr,news:newsP,stats,info,more,admin};
-let b=r=='m'?mdet(a):r=='t'?tdet(a):r=='n'?news(S.news.find(x=>x.id==a)||{t:'الخبر غير موجود',d:'',x:''}):(R[r||'']||home)();
-$('#app').innerHTML=(S.demo?'<div class="demo">⚠️ بيانات تجريبية — غير رسمية</div>':'')+(r=='admin'||r=='n'?'':shb())+b+`<footer>© ${e(S.info.name)} | من تصميم أبي أحمدو${r!='admin'?' • <a href="#/admin">🔐 الإدارة</a>':''}</footer>`;
+let b=r=='live'?livep(a):r=='m'?mdet(a):r=='t'?tdet(a):r=='n'?news(S.news.find(x=>x.id==a)||{t:'الخبر غير موجود',d:'',x:''}):(R[r||'']||home)();
+$('#app').innerHTML=(S.demo?'<div class="demo">⚠️ بيانات تجريبية — غير رسمية</div>':'')+(r=='admin'||r=='n'||r=='live'?'':shb())+b+`<footer>© ${e(S.info.name)} | من تصميم أبي أحمدو${r!='admin'?' • <a href="#/admin">🔐 الإدارة</a>':''}</footer>`;
 const nv=[['','🏠','الرئيسية'],['matches','📅','المباريات'],['table','📊','الترتيب'],['teams','🛡️','الفرق'],['more','☰','المزيد']];
 const on=r=='m'?'matches':r=='t'?'teams':['scorers','news','stats','info'].includes(r)?'more':(r||'');
 $('#nav').innerHTML=nv.map(x=>`<a href="#/${x[0]}" class="${x[0]==on?'on':''}"><span>${x[1]}</span>${x[2]}</a>`).join('');tick();if(r=='admin'&&U&&U.isOwner())S.matches.forEach((_,i)=>$('#t'+i)&&evT(i));if(r=='admin'&&!U.isOwner())chk()}
 addEventListener('hashchange',()=>{tab='o';render();scrollTo(0,0)});render();
-(async()=>{for(const u of[FN,'/api/data','data.json']){try{const r=await fetch(u,{cache:'no-store'});if(r.ok){const d=await r.json();if(d&&d.teams){S=d;mig();render();return}}}catch{}}})();
+(async()=>{for(const u of[FN,'/api/data','data.json']){try{const r=await fetch(u,{cache:'no-store'});if(r.ok){const tx=await r.text(),d=JSON.parse(tx);if(d&&d.teams){if(u==FN)lastJ=tx;S=d;mig();render();return}}}catch{}}})();
+setInterval(async()=>{if(U.isOwner()||document.hidden)return;try{const r=await fetch(FN,{cache:'no-store'});if(!r.ok)return;const t=await r.text();if(t!==lastJ){lastJ=t;const d=JSON.parse(t);if(d&&d.teams){const g0=gcn(S),n0=dcn(S);S=d;mig();render();if(gcn(S)>g0){const L=ms().find(m=>m.status=='live')||ms().filter(m=>m.status=='done').pop();toast('⚽ هدف! '+(L?`${T(L.a)?.name||''} ${L.sa??0} – ${L.sb??0} ${T(L.b)?.name||''}`:''));navigator.vibrate&&navigator.vibrate(200)}else if(dcn(S)>n0)toast('🏁 انتهت المباراة')}}}catch{}},20000);
 </script></body></html>
