@@ -84,6 +84,17 @@ export default async (req) => {
       const L = await all(), teams = {}; L.forEach((s) => (s.prefs.teams || []).forEach((t) => (teams[t] = (teams[t] || 0) + 1)));
       return J({ subs: L.length, active: L.filter((s) => !s.prefs.off).length, teams, all: L.filter((s) => s.prefs.all !== false && !s.prefs.off).length });
     }
+    if (b.action === "export") { // full private backup: VAPID keys + subscriptions + notification log
+      return J({ vapid: await vapid(meta), subs: (await all()).map(({ key, ...s }) => s), log: (await meta.get("log", { type: "json" })) || [] });
+    }
+    if (b.action === "import") { // restore on a fresh site (keys + subscriptions + log)
+      const v = b.vapid, okv = v && typeof v.pub === "string" && typeof v.d === "string" && fromB(v.pub).length === 65;
+      if (okv && !(process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY)) await meta.setJSON("vapid", { pub: v.pub, d: v.d });
+      let n = 0;
+      for (const s of (Array.isArray(b.subs) ? b.subs : []).slice(0, 5000)) { if (!s || !/^https:\/\//.test(String(s.endpoint)) || !s.keys || !s.keys.p256dh || !s.keys.auth) continue; await subs.setJSON(createHash("sha256").update(String(s.endpoint)).digest("hex"), { endpoint: clean(s.endpoint, 600), keys: { p256dh: clean(s.keys.p256dh, 200), auth: clean(s.keys.auth, 100) }, prefs: s.prefs || {}, t: s.t || Date.now() }); n++; }
+      if (Array.isArray(b.log)) await meta.setJSON("log", b.log.slice(0, 100));
+      return J({ ok: true, subs: n, vapid: !!okv });
+    }
     if (b.action === "notify") {
       const n = b.notif || {}, title = clean(n.title, 120), body = clean(n.body, 400);
       if (!title) return J({ error: "title" }, 400);
